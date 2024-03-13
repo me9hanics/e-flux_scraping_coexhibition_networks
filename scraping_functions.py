@@ -25,6 +25,15 @@ def get_announcements_of_artist(artist, contemporary = False):
     announcements = soup.find_all("a", class_="preview-announcement__title") #All announcements are in <a> tags with this class, see website
     return announcements
 
+def get_announcements_html(html):
+    if isinstance(html, BeautifulSoup):
+        soup = html
+    else: #Also support soup as input
+        soup = BeautifulSoup(html, "html.parser")
+
+    announcements = soup.find_all("a", class_="preview-announcement__title") #All announcements are in <a> tags with this class, see website
+    return announcements
+
 def process_announcements(announcements):
     announcements_list = []
     for announcement in announcements:
@@ -52,6 +61,7 @@ def process_announcements(announcements):
 
     return announcements_list
 
+### Scrolling functions:
 
 def scroll_scrape_website(url):
     #Note: this is recommended only for 1-time use, because it takes time to open the browser.
@@ -70,6 +80,36 @@ def scroll_scrape_website(url):
         if new_height == last_height: #We didn't scroll anymore
             break
         last_height = new_height
+
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    driver.quit()
+
+    return soup
+
+def scroll_scrape_website_with_retry(url):
+    #Note: this is recommended only for 1-time use, because it takes time to open the browser.
+    #For more artists the scroll_scrape_multiple_websites() function is recommended, and only if get_announcements_of_artist() is at its limit: 30
+    driver = webdriver.Firefox()  #Open Firefox
+    driver.get(url)  #Open the website
+
+    #Scroll height: useful for scrolling
+    last_height = driver.execute_script("return document.body.scrollHeight")
+
+    step_counter = 0
+
+    while True:
+        step_counter += 1
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  #Scroll to "height"-> bottom of the page
+        time.sleep(2)  #Wait for loading
+        #Calculate new height
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:  #We didn't scroll anymore
+            if step_counter == 1: #We retry if this is first iteration. This is because the website may not have loaded properly
+                continue
+            else:
+                break
+        last_height = new_height
+        
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     driver.quit()
