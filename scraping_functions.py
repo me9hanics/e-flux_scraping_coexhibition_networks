@@ -56,28 +56,21 @@ def process_announcements(announcements):
 def scroll_scrape_website(url):
     #Note: this is recommended only for 1-time use, because it takes time to open the browser.
     #For more artists the scroll_scrape_multiple_websites() function is recommended, and only if get_announcements_of_artist() is at its limit: 30
-    driver = webdriver.Firefox()
+    driver = webdriver.Firefox()#Open Firefox
+    driver.get(url) #Open the website
 
-    # Go to your page url
-    driver.get(url)
-
-    # Get scroll height
+    #Scroll height: useful for scrolling
     last_height = driver.execute_script("return document.body.scrollHeight")
 
     while True:
-        # Scroll down to bottom
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
-        # Wait to load page
-        time.sleep(2)
-
-        # Calculate new scroll height and compare with last scroll height
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);") #Scroll to "height"-> bottom of the page
+        time.sleep(2)#Wait for loading
+        #Calculate new height
         new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
+        if new_height == last_height: #We didn't scroll anymore
             break
         last_height = new_height
 
-    # Now you can parse the page source with BeautifulSoup
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     driver.quit()
 
