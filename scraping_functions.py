@@ -34,6 +34,12 @@ def get_announcements_html(html):
     announcements = soup.find_all("a", class_="preview-announcement__title") #All announcements are in <a> tags with this class, see website
     return announcements
 
+def get_parts_of_soup_block(soup_block):
+    parts = []
+    for i in soup_block:
+        parts.append(i)
+    return parts
+
 def process_announcements(announcements):
     announcements_list = []
     for announcement in announcements:
@@ -46,8 +52,21 @@ def process_announcements(announcements):
         except:
             print(f"'ID' problem with announcement: {announcement}, id: {announcement_dict['id']}")
 
-        #TODO announcement_dict['artist_name'] = TODO (after <a> tag, before </br> tag, but may not have a name)
-            
+        #(after <a> tag, before </br> tag, but may not have a name) #TODO make it more robust
+        announcement_dict['title_artists'] = None
+        parts = get_parts_of_soup_block(announcement)
+        num_of_artists = np.sum([1 for x in parts if x.name == "br"])
+    
+        if num_of_artists > 0:
+            artist_names = []
+            for part in parts:
+                if part.name == "br":
+                    artist_names += [last_part]
+                else:
+                    last_part = part.get_text().strip()
+            announcement_dict['title_artists'] = ", ".join(artist_names)
+        
+
         announcement_dict['title'] = None
         try:
             announcement_dict['title'] = announcement.find("em").text.strip()
