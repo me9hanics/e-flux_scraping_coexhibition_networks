@@ -1,0 +1,7 @@
+
+
+-Add functionalities: dates, locations (announcements)
+
+Go through all artists and gather their exhibitions (later maybe)
+
+Potentially use some more complicated methods for every announcement
