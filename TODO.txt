@@ -1,7 +1,16 @@
+Web scraping: Artists announcements
+-Add functionalities: announcement dates, "announcer"
+-locations? ()
 
+After this: Go through all artists and gather their exhibitions
 
--Add functionalities: dates, locations (announcements)
+Web scraping: Text from announcements
 
-Go through all artists and gather their exhibitions (later maybe)
+-Get info from announcements themselves
+-Potentially use some more complicated methods for every announcement
 
-Potentially use some more complicated methods for every announcement
+Other:
+
+Do a minimal working example e.g. with just the contemporary artists (don't need to use Selenium)
+Artist gathering: maybe also extract how many announcements each artist has (not sure if we need it now and because we use multiple )
+
