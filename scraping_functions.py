@@ -80,6 +80,13 @@ def process_announcements(announcements):
 
     return announcements_list
 
+def get_subtitles_and_announcement_dates(soup):
+    subtitles = soup.findAll('div', class_='preview-announcement__subtitle')
+    announcement_dates = soup.findAll('div', class_='preview-announcement__date')
+    subtitles = [subtitle.text.strip() for subtitle in subtitles]
+    announcement_dates = [announcement_date.text.strip() for announcement_date in announcement_dates]
+    return subtitles, announcement_dates
+
 ### Scrolling functions:
 
 def scroll_scrape_website(url):
@@ -167,18 +174,25 @@ def scroll_scrape_multiple_websites(urls):
 
     return all_soups
 
-def get_announcements_of_artist_scroll_if_needed(artist, contemporary = False, silent = True):
-    artist_announcements = get_announcements_of_artist(artist, contemporary)
+def get_announcements_of_artist_scroll_if_needed(artist, subtitles_and_dates=True, contemporary = False, silent = True):
+    html = get_html_of_artist(artist, contemporary)
+    soup = BeautifulSoup(html, "html.parser")
+    artist_announcements = get_announcements_html(soup)
     if len(artist_announcements) == 30:
         url = f"https://www.e-flux.com/announcements/?p[]={artist}"
         if contemporary:
             url += "&c[]=Contemporary%20Art&c[]=Data%20%26%20Information&c[]=Installation&c[]=Mixed%20Media&c[]=Posthumanism&c[]=Postmodernism&c[]=Technology"
-            
+
         if not silent:
             print(f"{artist}: over 30 announcements. Scrolling")
         soup = scroll_scrape_website_with_retry(url)
         artist_announcements = get_announcements_html(soup)
     processed_announcements = process_announcements(artist_announcements)
+    if subtitles_and_dates:
+        subtitles, announcement_dates = get_subtitles_and_announcement_dates(soup)
+        for i, announcement in enumerate(processed_announcements):
+            announcement['subtitle'] = subtitles[i]
+            announcement['announcement_date'] = announcement_dates[i]
     return processed_announcements
 
 def get_announcements_of_artists_scroll_if_needed(artists, contemporary = False):
