@@ -11,7 +11,7 @@ import time
 
 def get_html_of_artist(artist, contemporary = False):
     if contemporary:
-        url = f"https://www.e-flux.com/announcements/?c[]=Contemporary%20Art&p[]={artist}"
+        url = f"https://www.e-flux.com/announcements/?c[]=Contemporary%20Art&c[]=Data%20%26%20Information&c[]=Installation&c[]=Mixed%20Media&c[]=Posthumanism&c[]=Postmodernism&c[]=Technology&p[]={artist}"
     else:
         url = f"https://www.e-flux.com/announcements/?p[]={artist}"
 
@@ -134,3 +134,54 @@ def scroll_scrape_website_with_retry(url):
     driver.quit()
 
     return soup
+
+def scroll_scrape_multiple_websites(urls):
+    #Note: this is recommended for multiple artists, because it takes time to open the browser only once.
+    driver = webdriver.Firefox()  #Open Firefox
+
+    all_soups = []
+    for url in urls:
+        driver.get(url)  #Open the website
+
+        #Scroll height: useful for scrolling
+        last_height = driver.execute_script("return document.body.scrollHeight")
+
+        step_counter = 0
+        while True:
+            step_counter += 1
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  #Scroll to "height"-> bottom of the page
+            time.sleep(2)  #Wait for loading
+            #Calculate new height
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:  #We didn't scroll anymore
+                if step_counter == 1:
+                    continue
+                else:
+                    break
+            last_height = new_height
+
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        all_soups.append(soup)
+
+    driver.quit()
+
+    return all_soups
+
+def get_announcements_of_artist_scroll_if_needed(artist, contemporary = False):
+    artist_announcements = get_announcements_of_artist(artist, contemporary)
+    if len(artist_announcements) == 30:
+        url = f"https://www.e-flux.com/announcements/?p[]={artist}"
+        if contemporary:
+            url += "&c[]=Contemporary%20Art&c[]=Data%20%26%20Information&c[]=Installation&c[]=Mixed%20Media&c[]=Posthumanism&c[]=Postmodernism&c[]=Technology"
+        soup = scroll_scrape_website_with_retry(url)
+        artist_announcements = get_announcements_html(soup)
+    processed_announcements = process_announcements(artist_announcements)
+    return processed_announcements
+
+def get_announcements_of_artists_scroll_if_needed(artists, contemporary = False):
+    all_artists_announcements = []
+    for artist in artists:
+        artist_dict = {'name': artist, 'announcements': []}
+        artist_dict['announcements'] = get_announcements_of_artist_scroll_if_needed(artist, contemporary)
+        all_artists_announcements.append(artist_dict)
+    return all_artists_announcements
