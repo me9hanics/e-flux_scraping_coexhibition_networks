@@ -167,12 +167,15 @@ def scroll_scrape_multiple_websites(urls):
 
     return all_soups
 
-def get_announcements_of_artist_scroll_if_needed(artist, contemporary = False):
+def get_announcements_of_artist_scroll_if_needed(artist, contemporary = False, silent = True):
     artist_announcements = get_announcements_of_artist(artist, contemporary)
     if len(artist_announcements) == 30:
         url = f"https://www.e-flux.com/announcements/?p[]={artist}"
         if contemporary:
             url += "&c[]=Contemporary%20Art&c[]=Data%20%26%20Information&c[]=Installation&c[]=Mixed%20Media&c[]=Posthumanism&c[]=Postmodernism&c[]=Technology"
+            
+        if not silent:
+            print(f"{artist}: over 30 announcements. Scrolling")
         soup = scroll_scrape_website_with_retry(url)
         artist_announcements = get_announcements_html(soup)
     processed_announcements = process_announcements(artist_announcements)
