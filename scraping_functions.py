@@ -178,8 +178,6 @@ def scroll_scrape_multiple_websites(urls):
     return all_soups
 
 def get_announcements_of_artist_scroll_if_needed(artist, driver=None, close_driver = True, subtitles_and_dates=True, contemporary = False, silent = True):
-    if driver is None:
-        driver = webdriver.Firefox()  #Open Firefox
 
     html = get_html_of_artist(artist, contemporary)
     soup = BeautifulSoup(html, "html.parser")
@@ -191,20 +189,37 @@ def get_announcements_of_artist_scroll_if_needed(artist, driver=None, close_driv
 
         if not silent:
             print(f"{artist}: over 30 announcements. Scrolling")
+        if driver is None:
+            driver = webdriver.Firefox()  #Open Firefox
         soup = scroll_scrape_website_with_retry(url, driver = driver, close_driver = close_driver)
         artist_announcements = get_announcements_html(soup)
     processed_announcements = process_announcements(artist_announcements)
     if subtitles_and_dates:
         subtitles, announcement_dates = get_subtitles_and_announcement_dates(soup)
-        if (len(subtitles) == len(processed_announcements)) and (len(announcement_dates) == len(processed_announcements)):
-            for i, announcement in enumerate(processed_announcements):
-                announcement['subtitle'] = subtitles[i]
-                announcement['announcement_date'] = announcement_dates[i]
+
+        #Below every case is handled separately with 1 enumeration. This could be bad code, but this is to speed up processing
+        if (len(announcement_dates) == len(processed_announcements)):
+            if (len(subtitles) == len(processed_announcements)):
+                for i, announcement in enumerate(processed_announcements):
+                    announcement['subtitle'] = subtitles[i]
+                    announcement['announcement_date'] = announcement_dates[i]
+            else:
+                print(f"Problem with amount of subtitles for:{artist}")
+                for i, announcement in enumerate(processed_announcements):
+                    announcement['subtitle'] = subtitles[i]
+                    announcement['announcement_date'] = None
         else:
-            print(f"Problem with amount of subtitles or announcement dates for:{artist}")
-            for i, announcement in enumerate(processed_announcements):
-                announcement['subtitle'] = None
-                announcement['announcement_date'] = None
+            print(f"Problem with amount of announcement dates for:{artist}")
+            if (len(subtitles) == len(processed_announcements)):
+                for i, announcement in enumerate(processed_announcements):
+                    announcement['subtitle'] = None
+                    announcement['announcement_date'] = subtitles[i]
+            else:
+                print(f"Problem with amount of subtitles for:{artist}")
+                for i, announcement in enumerate(processed_announcements):
+                    announcement['subtitle'] = None
+                    announcement['announcement_date'] = None
+
     return processed_announcements
 
 def get_announcements_of_artists_scroll_if_needed(artists, contemporary = False):
