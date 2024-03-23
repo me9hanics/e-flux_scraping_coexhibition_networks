@@ -112,10 +112,12 @@ def scroll_scrape_website(url):
 
     return soup
 
-def scroll_scrape_website_with_retry(url):
+def scroll_scrape_website_with_retry(url, driver = None, close_driver = True):
     #Note: this is recommended only for 1-time use, because it takes time to open the browser.
     #For more artists the scroll_scrape_multiple_websites() function is recommended, and only if get_announcements_of_artist() is at its limit: 30
-    driver = webdriver.Firefox()  #Open Firefox
+    
+    if driver is None:
+        driver = webdriver.Firefox()
     driver.get(url)  #Open the website
 
     #Scroll height: useful for scrolling
@@ -138,7 +140,8 @@ def scroll_scrape_website_with_retry(url):
         
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    driver.quit()
+    if close_driver:
+        driver.quit()
 
     return soup
 
@@ -174,7 +177,10 @@ def scroll_scrape_multiple_websites(urls):
 
     return all_soups
 
-def get_announcements_of_artist_scroll_if_needed(artist, subtitles_and_dates=True, contemporary = False, silent = True):
+def get_announcements_of_artist_scroll_if_needed(artist, driver=None, close_driver = True, subtitles_and_dates=True, contemporary = False, silent = True):
+    if driver is None:
+        driver = webdriver.Firefox()  #Open Firefox
+
     html = get_html_of_artist(artist, contemporary)
     soup = BeautifulSoup(html, "html.parser")
     artist_announcements = get_announcements_html(soup)
@@ -185,20 +191,36 @@ def get_announcements_of_artist_scroll_if_needed(artist, subtitles_and_dates=Tru
 
         if not silent:
             print(f"{artist}: over 30 announcements. Scrolling")
-        soup = scroll_scrape_website_with_retry(url)
+        soup = scroll_scrape_website_with_retry(url, driver = driver, close_driver = close_driver)
         artist_announcements = get_announcements_html(soup)
     processed_announcements = process_announcements(artist_announcements)
     if subtitles_and_dates:
         subtitles, announcement_dates = get_subtitles_and_announcement_dates(soup)
-        for i, announcement in enumerate(processed_announcements):
-            announcement['subtitle'] = subtitles[i]
-            announcement['announcement_date'] = announcement_dates[i]
+        if (len(subtitles) == len(processed_announcements)) and (len(announcement_dates) == len(processed_announcements)):
+            for i, announcement in enumerate(processed_announcements):
+                announcement['subtitle'] = subtitles[i]
+                announcement['announcement_date'] = announcement_dates[i]
+        else:
+            print(f"Problem with amount of subtitles or announcement dates for:{artist}")
+            for i, announcement in enumerate(processed_announcements):
+                announcement['subtitle'] = None
+                announcement['announcement_date'] = None
     return processed_announcements
 
 def get_announcements_of_artists_scroll_if_needed(artists, contemporary = False):
     all_artists_announcements = []
     for artist in artists:
         artist_dict = {'name': artist, 'announcements': []}
-        artist_dict['announcements'] = get_announcements_of_artist_scroll_if_needed(artist, contemporary)
+        artist_dict['announcements'] = get_announcements_of_artist_scroll_if_needed(artist, contemporary = contemporary)
         all_artists_announcements.append(artist_dict)
+    return all_artists_announcements
+
+def get_announcements_of_artists_scrolling(artists, contemporary=False):
+    all_artists_announcements = []
+    driver = webdriver.Firefox()  #Open Firefox
+    for artist in artists:
+        artist_dict = {'name': artist, 'announcements': []}
+        artist_dict['announcements'] = get_announcements_of_artist_scroll_if_needed(artist,driver, close_driver=False, contemporary=contemporary) 
+        all_artists_announcements.append(artist_dict)
+    driver.quit()
     return all_artists_announcements
