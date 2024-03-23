@@ -206,14 +206,14 @@ def get_announcements_of_artist_scroll_if_needed(artist, driver=None, close_driv
             else:
                 print(f"Problem with amount of subtitles for:{artist}")
                 for i, announcement in enumerate(processed_announcements):
-                    announcement['subtitle'] = subtitles[i]
-                    announcement['announcement_date'] = None
+                    announcement['subtitle'] = None
+                    announcement['announcement_date'] = announcement_dates[i]
         else:
             print(f"Problem with amount of announcement dates for:{artist}")
             if (len(subtitles) == len(processed_announcements)):
                 for i, announcement in enumerate(processed_announcements):
-                    announcement['subtitle'] = None
-                    announcement['announcement_date'] = subtitles[i]
+                    announcement['subtitle'] = subtitles[i]
+                    announcement['announcement_date'] = None
             else:
                 print(f"Problem with amount of subtitles for:{artist}")
                 for i, announcement in enumerate(processed_announcements):
