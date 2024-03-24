@@ -230,7 +230,7 @@ def get_announcements_of_artists_scroll_if_needed(artists, contemporary = False)
         all_artists_announcements.append(artist_dict)
     return all_artists_announcements
 
-def get_announcements_of_artists_scrolling(artists, contemporary=False):
+def get_announcements_of_artists_opened_browser(artists, contemporary=False):
     all_artists_announcements = []
     driver = webdriver.Firefox()  #Open Firefox
     for artist in artists:
