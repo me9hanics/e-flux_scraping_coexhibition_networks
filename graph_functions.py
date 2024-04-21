@@ -66,43 +66,36 @@ def create_subgraph_from_names(g, names, name_to_vertex):
                 edge_weights[edge_sub] = g.edge_properties["weight"][edge]
 
     g_sub.edge_properties["weight"] = edge_weights
-
     return g_sub
 
 def create_subgraph_from_edges(g, edges):
-    # Create a new graph
+    #New graph (this way, we can keep the original graph intact)
     g_sub = Graph(directed=False)
 
-    # Create a dictionary to map names to new vertices
     name_to_new_vertex = {}
-
-    # Create a vertex property map for the names
     name_property = g_sub.new_vertex_property("string")
 
-    # Add vertices to the new graph
+    #Add vertices (we go through edges to find the nodes, could do this other ways too, but this is a simple
+    #way of adding only those nodes that appear in the subgraph, not all nodes then removing isolated ones)
     for edge in edges:
         name1 = g.vertex_properties["artist_name"][edge.source()]
         name2 = g.vertex_properties["artist_name"][edge.target()]
         if name1 not in name_to_new_vertex:
             v1 = g_sub.add_vertex()
             name_property[v1] = name1
-            name_to_new_vertex[name1] = v1  # Map the name to the new vertex
+            name_to_new_vertex[name1] = v1
         if name2 not in name_to_new_vertex:
             v2 = g_sub.add_vertex()
             name_property[v2] = name2
-            name_to_new_vertex[name2] = v2  # Map the name to the new vertex
-
+            name_to_new_vertex[name2] = v2
     g_sub.vertex_properties["name"] = name_property
 
-    # Create an edge property map for the weights
+    #Weights
     edge_weights = g_sub.new_edge_property("int")
-
     for edge in edges:
         name1 = g.vertex_properties["artist_name"][edge.source()]
         name2 = g.vertex_properties["artist_name"][edge.target()]
         edge_sub = g_sub.add_edge(name_to_new_vertex[name1], name_to_new_vertex[name2])
         edge_weights[edge_sub] = g.edge_properties["weight"][edge]
-
     g_sub.edge_properties["weight"] = edge_weights
-
     return g_sub
