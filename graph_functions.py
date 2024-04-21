@@ -5,7 +5,7 @@ def build_nodes(announcements, artists):
     g = Graph(directed=False)
     artist_to_vertex = {}
     for announcement in announcements.values():
-        announcement_artists = announcement['artists']
+        #announcement_artists = announcement['artists']
         for artist in artists:
             if artist not in artist_to_vertex:
                 v = g.add_vertex()
