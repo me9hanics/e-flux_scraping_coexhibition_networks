@@ -39,7 +39,7 @@ def create_graph(announcements, artists):
     g = build_edges(g, artist_to_vertex, announcements)
     return g, artist_to_vertex
 
-
+#Including only a set of nodes (names)
 def create_subgraph_from_names(g, names, name_to_vertex):
     g_sub = Graph(directed=False)
     #For the new graph, new name-vertex mapping
@@ -68,6 +68,7 @@ def create_subgraph_from_names(g, names, name_to_vertex):
     g_sub.edge_properties["weight"] = edge_weights
     return g_sub
 
+#Including only a set of edges
 def create_subgraph_from_edges(g, edges):
     #New graph (this way, we can keep the original graph intact)
     g_sub = Graph(directed=False)
