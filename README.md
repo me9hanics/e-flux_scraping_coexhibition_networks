@@ -122,6 +122,8 @@ The dictionary are stored in `data/announcements.json` and `data/announcements_c
 
 Using the `graph-tool` library, and functions in `graph_functions.py`, we firstly created a large network of artists, where two artists are connected if they have a common exhibition. We then created two smaller networks: one where two artists are only connected if they share two common exhibitions (this network was in the end not analyzed) and one where only a subset of artist are included, who are in [PainterPalette](https://github.com/me9hanics/PainterPalette) (the said before project, which has a lot of data (e.g. nationality, locations, style, movement, birth and death year, gender) about painters and some other artists). The intersection of the two datasets include around 1000~ artists, with 53000 connections between them.
 
+The two networks are saved in the `data` folder as `coexhibition_network.gt.gz` and `coexhibition_network_selected_artists.gt.gz` (the official documentation recommends saving the graph in binary format, for perfect reconstruction, hence the gzip archive format).
+
 5) **Analysis**
 
 The separate notebooks describe the exploration process of analyzing the network of coexhibitions, artist trajectories, looking for data mining association rules and detecting communities. Below is a picture of 47 separate communities, based on the nested blockmodel algorithm.
