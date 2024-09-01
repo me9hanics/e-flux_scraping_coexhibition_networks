@@ -1,8 +1,8 @@
 # e-flux_scraping_coexhibition_networks
  Project work at the Central European University, collecting data about contemporary art exhibitions from the website [e-flux](https://e-flux.com/), creating connections between museum, artists.
 
-Artem Timonov, Mihaly Hanics, Sebastian Štros
-
+Artem Timonov, Mihaly Hanics, Sebastian Štros<br>
+Central European University, Vienna - Data Science MSc
 ## <u> **Description:**</u>
 
 In this work, we focus on collecting information on artists and their exhibitions. We create networks based on the coexhibitions of artists, which we then further analyze. This repository contains the methods for collecting the artists, cleaning and preprocessing, gathering the coexhibitions and creating a network of coexhibitions which then we analyze.
