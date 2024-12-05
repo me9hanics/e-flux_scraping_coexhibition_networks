@@ -1,4 +1,8 @@
-# E-flux: Coexhibition networks of artists, via web scraping and Python
+# Coexhibition-network
+**Technical description of creating coexhibition networks of artists, via web scraping the E-flux website using Python.**
+
+![intro-image](images/pres-1.png)
+
 Project work at the Central European University, collecting data about contemporary art exhibitions from the website [e-flux](https://e-flux.com/), creating connections between museum, artists.
 
 Artem Timonov, Mihaly Hanics, Sebastian Štros<br>
